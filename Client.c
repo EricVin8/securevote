@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #define resolver_server_address "192.168.1.16"
 char *resolve(int state) {
     char *newip;
@@ -24,7 +26,27 @@ char *resolve(int state) {
     return newip;
     
 }
+SSL_CTX* InitCTX(void)
+{
+    SSL_METHOD *method;
+    SSL_CTX *ctx;
+    OpenSSL_add_all_algorithms();  /* Load cryptos, et.al. */
+    SSL_load_error_strings();   /* Bring in and register error messages */
+    method = TLSv1_2_client_method();  /* Create new client-method instance */
+    ctx = SSL_CTX_new(method);   /* Create new context */
+    if ( ctx == NULL )
+    {
+        ERR_print_errors_fp(stderr);
+        abort();
+    }
+    return ctx;
+}
 int main() {
+SSL_CTX *ctx;
+SSL *ssl;
+ctx = InitCTX;
+ssl = SSL_new(ctx);
+
 char *ip = resolve(1);
 int network_socket;
 network_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -40,6 +62,8 @@ if (connection_status == -1) {
 printf("Shrek whispers in your ear, There was an error making a connection to the remote socket");
 return -1;
  }
+ 
+SSL_set_fd(ssl, network_socket); 
 
 close(network_socket);
 
