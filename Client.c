@@ -28,11 +28,11 @@ char *resolve(int state) {
 }
 SSL_CTX* InitCTX(void)
 {
-    SSL_METHOD *method;
+    const SSL_METHOD *method;
     SSL_CTX *ctx;
     OpenSSL_add_all_algorithms();  /* Load cryptos, et.al. */
     SSL_load_error_strings();   /* Bring in and register error messages */
-    method = TLSv1_2_client_method();  /* Create new client-method instance */
+    method = SSLv23_client_method();  /* Create new client-method instance */
     ctx = SSL_CTX_new(method);   /* Create new context */
     if ( ctx == NULL )
     {
@@ -44,7 +44,8 @@ SSL_CTX* InitCTX(void)
 int main() {
 SSL_CTX *ctx;
 SSL *ssl;
-ctx = InitCTX;
+SSL_library_init();
+ctx = InitCTX();
 ssl = SSL_new(ctx);
 
 char *ip = resolve(1);
@@ -64,8 +65,9 @@ return -1;
  }
  
 SSL_set_fd(ssl, network_socket); 
-
+SSL_get_cipher(ssl);
+SSL_free(ssl);
 close(network_socket);
-
+SSL_CTX_free(ctx);
 return 0;
 }

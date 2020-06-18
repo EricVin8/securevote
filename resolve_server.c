@@ -82,7 +82,7 @@ int main() {
     //client handler
     while(1) {
     client_socket = accept(ssocket, NULL, NULL);
-    recv(client_socket, &client_reply, sizeof(client_reply), 0);
+    read(client_socket, &client_reply, sizeof(client_reply));
     switch(client_reply) {
         case(1):
       redirect_ip = Alabama;   
@@ -186,7 +186,7 @@ int main() {
      redirect_ip = Wyoming;  
     
     }
-    send(client_socket, redirect_ip, sizeof(redirect_ip), 0);
+    write(client_socket, redirect_ip, sizeof(redirect_ip));
     close(client_socket);
     
     }
