@@ -17,17 +17,17 @@
 int padding = RSA_PKCS1_PADDING;
 
 
-char *decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *filename, unsigned char *result) {
+int decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *filename, unsigned char *result) {
     FILE * key = fopen(filename,"rb");
     if(key == NULL)
     {
         printf("%s cannot be found!\n",filename);
-        return NULL;    
+        return -1;    
     }
     RSA *rsa= RSA_new() ;
     rsa = PEM_read_RSAPrivateKey(key, &rsa,NULL, NULL);
-    int result = RSA_private_decrypt(encoded_data_length, encoded, result, rsa, padding);
-    return result;
+    int resultstatus = RSA_private_decrypt(encoded_data_length, encoded, result, rsa, padding);
+    return resultstatus;
 
 }
 SSL_CTX *init_context()
