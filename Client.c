@@ -5,9 +5,32 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <openssl/rsa.h>
+#include <openssl/evp.h>
+#include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #define resolver_server_address "192.168.1.16"
+int padding = RSA_PKCS1_PADDING;
+
+
+int encrypt(int length, unsigned char *toencrypt, unsigned char *result, unsigned char *filename) {
+    
+    FILE * file = fopen(filename,"rb");
+ 
+    if(file == NULL)
+    {
+        printf("Unable to open file %s \n",filename);
+        return -1;    
+    }
+    RSA *rsa= RSA_new() ;
+    rsa = PEM_read_RSA_PUBKEY(file, &rsa,NULL, NULL);
+    int resultstat = RSA_public_encrypt(length, toencrypt, result, rsa, padding);
+    return resultstat;
+    
+}
+
+
 char *resolve(int state) {
     char *newip;
     int nsocket = socket(AF_INET, SOCK_STREAM, 0);
