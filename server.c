@@ -20,16 +20,20 @@
 int padding = RSA_PKCS1_PADDING;
 
 
-int decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *filename, unsigned char *result) {
-    FILE * key = fopen(filename,"rb");
+int decrypt_into_arguments(int encoded_data_length, unsigned char *encoded, unsigned char *filename, char **arguments) {
+    char* result;
+    FILE * key = fopen(strncat(filename, ".pem", 11),"rb");
     if(key == NULL)
     {
         printf("%s cannot be found!\n",filename);
         return -1;    
     }
-    RSA *rsa= RSA_new() ;
-    rsa = PEM_read_RSAPrivateKey(key, &rsa,NULL, NULL);
+    RSA *rsa= RSA_new();
+    rsa = PEM_read_RSAPrivateKey(key, &rsa, NULL, NULL);
     int resultstatus = RSA_private_decrypt(encoded_data_length, encoded, result, rsa, padding);
+    //todo split into arguments at split
+
+
     return resultstatus;
 
 }
@@ -90,18 +94,28 @@ int main() {
     while(1) {
         struct sockaddr_in client;
         int length = sizeof(client);
-        char *voterfname, *voterlname, *ssnumber, *idnumber, *canidate;
+        int encoded_data_length;
+        char *voterfname, *voterlname, *ssnumber, *idnumber, *canidate, *idnumber2;
+        char *voterinfoencrypted;
+        char *arguments[] = {voterfname, voterlname, ssnumber, idnumber, canidate};
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
         SSL *ssl = SSL_new(context);
-
+        SSL_read(ssl, voterinfoencrypted, sizeof(voterinfoencrypted));
+        SSL_read(ssl, idnumber2, sizeof(idnumber2));
+        SSL_read(ssl, &encoded_data_length, sizeof(encoded_data_length));
+        decrypt_into_arguments(encoded_data_length, voterinfoencrypted, idnumber2, arguments);
         int index = sqlite3_bind_parameter_index(result, "@id");
         sqlite3_bind_int(result, index, value);
         if(strncmp(voterfname, sqlite3_column_text(result, 0), strlen(sqlite3_column_text(result, 0))) && strncmp(voterlname, sqlite3_column_text(result, 1), strlen(sqlite3_column_text(result, 1))) && strncmp(ssnumber, sqlite3_column_text(result, 2), strlen(sqlite3_column_text(result, 2))) && strncmp(idnumber, sqlite3_column_text(result, 3), strlen(sqlite3_column_text(result, 3))) && sqlite3_column_text(result, 4) == NULL) {
          char *safecanidate = sqlite3_mprintf("UPDATE Voters SET canidate = '%q' WHERE idnumber = %q;", canidate, idnumber);
          sqlite3_exec(database, safecanidate, 0, 0, 0);
+         sqlite3_free(safecanidate);
         }
         else{
+            SSL_shutdown(ssl);
+            SSL_free(ssl);
+            close(csocket);
          //todo: write code to return failure, and also increment ip suspicion value   
         }
         SSL_shutdown(ssl);
