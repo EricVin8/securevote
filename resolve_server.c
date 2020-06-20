@@ -186,7 +186,7 @@ int main() {
      redirect_ip = Wyoming;  
     
     }
-    write(client_socket, redirect_ip, sizeof(redirect_ip));
+    send(client_socket, redirect_ip, strlen(redirect_ip) + 1, 0);
     close(client_socket);
     
     }
