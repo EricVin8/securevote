@@ -10,6 +10,9 @@
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <sqlite3.h>
+#include <string.h>
+
 
 #define server_address "192.168.1.16"
 #define tcp_backlog 5
@@ -47,9 +50,17 @@ SSL_CTX *init_context()
     return ctx;
 }
 
+
 int main() {
 
+    sqlite3 *database;
+    int status = sqlite3_open("voters.db", &database);
+    sqlite3_stmt *result;
+    char *sqlcommand = "SELECT Firstname, Lastname, SSnumber, idnumber, canidate FROM Voters where idnumber = @id;";
+    status = sqlite3_prepare_v2(database, sqlcommand, -1, &result, 0);
     
+    
+
     SSL_load_error_strings();	
     OpenSSL_add_ssl_algorithms();
 
@@ -79,10 +90,20 @@ int main() {
     while(1) {
         struct sockaddr_in client;
         int length = sizeof(client);
-
+        char *voterfname, *voterlname, *ssnumber, *idnumber, *canidate;
+        int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
         SSL *ssl = SSL_new(context);
-        SSL_set_fd(ssl, csocket);
+
+        int index = sqlite3_bind_parameter_index(result, "@id");
+        sqlite3_bind_int(result, index, value);
+        if(strncmp(voterfname, sqlite3_column_text(result, 0), strlen(sqlite3_column_text(result, 0))) && strncmp(voterlname, sqlite3_column_text(result, 1), strlen(sqlite3_column_text(result, 1))) && strncmp(ssnumber, sqlite3_column_text(result, 2), strlen(sqlite3_column_text(result, 2))) && strncmp(idnumber, sqlite3_column_text(result, 3), strlen(sqlite3_column_text(result, 3))) && sqlite3_column_text(result, 4) == NULL) {
+         char *safecanidate = sqlite3_mprintf("UPDATE Voters SET canidate = '%q' WHERE idnumber = %q;", canidate, idnumber);
+         sqlite3_exec(database, safecanidate, 0, 0, 0);
+        }
+        else{
+         //todo: write code to return failure, and also increment ip suspicion value   
+        }
         SSL_shutdown(ssl);
         SSL_free(ssl);
         close(csocket);
