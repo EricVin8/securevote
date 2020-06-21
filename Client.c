@@ -147,7 +147,6 @@ SSL_write(ssl, eid, sizeof(eid));
 SSL_write(ssl, &idlen, sizeof(idlen));
 SSL_write(ssl, ecanidate, sizeof(ecanidate));
 SSL_write(ssl, &canidatelen, sizeof(canidatelen));
-printf("%d", canidatelen);
 SSL_write(ssl, id2, strlen(id2));
 
 

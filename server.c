@@ -16,7 +16,7 @@
 
 #define server_address "192.168.1.16"
 #define tcp_backlog 5
-
+#define CHK_SSL(err) if ((err)==-1) { ERR_print_errors_fp(stderr); exit(2); }
 int padding = RSA_PKCS1_PADDING;
 
 
@@ -56,7 +56,7 @@ SSL_CTX *init_context()
 
 
 int main() {
-
+    int err;
     sqlite3 *database;
     int status = sqlite3_open("voters.db", &database);
     sqlite3_stmt *result;
@@ -114,17 +114,17 @@ int main() {
         }
 
         printf ("SSL connection using %s\n", SSL_get_cipher (ssl));
-        SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted));
-        SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname));
-        SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted));
-        SSL_read(ssl, &lenvoterlname, sizeof(lenvoterlname));
-        SSL_read(ssl, ssnumberencrypted, sizeof(ssnumberencrypted));
-        SSL_read(ssl, &lenssnumber, sizeof(lenssnumber));
-        SSL_read(ssl, idnumberencrypted, sizeof(idnumberencrypted));
-        SSL_read(ssl, &lenidnumber, sizeof(lenidnumber));
-        SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted));
-        SSL_read(ssl, &lencanidate, sizeof(lencanidate));
-        SSL_read(ssl, idnumber2, sizeof(idnumber2));
+        err = SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted)); CHK_SSL(err);
+        err = SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname)); CHK_SSL(err);
+        err = SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted)); CHK_SSL(err);
+        err = SSL_read(ssl, &lenvoterlname, sizeof(lenvoterlname)); CHK_SSL(err);
+        err = SSL_read(ssl, ssnumberencrypted, sizeof(ssnumberencrypted)); CHK_SSL(err);
+        err = SSL_read(ssl, &lenssnumber, sizeof(lenssnumber)); CHK_SSL(err);
+        err = SSL_read(ssl, idnumberencrypted, sizeof(idnumberencrypted)); CHK_SSL(err);
+        err = SSL_read(ssl, &lenidnumber, sizeof(lenidnumber)); CHK_SSL(err);
+        err = SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted)); CHK_SSL(err);
+        err = SSL_read(ssl, &lencanidate, sizeof(lencanidate)); CHK_SSL(err);
+        err = SSL_read(ssl, idnumber2, sizeof(idnumber2)); CHK_SSL(err);
         decrypt(lenvoterfname, voterfnameencrypted, idnumber2, voterfname);
         decrypt(lenvoterlname, voterlnameencrypted, idnumber2, voterlname);
         decrypt(lenssnumber, ssnumberencrypted, idnumber2, ssnumber);
