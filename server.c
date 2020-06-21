@@ -101,6 +101,11 @@ int main() {
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
         SSL *ssl = SSL_new(context);
+        if (SSL_accept(ssl) <= 0) {
+            perror("Unable to accept");
+            exit(EXIT_FAILURE);
+
+        }
         SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted));
         SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname));
         SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted));
