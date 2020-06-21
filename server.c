@@ -16,7 +16,6 @@
 
 #define server_address "192.168.1.16"
 #define tcp_backlog 5
-#define CHK_SSL(err) if ((err)==-1) { ERR_print_errors_fp(stderr); exit(2); }
 int padding = RSA_PKCS1_PADDING;
 
 
@@ -114,17 +113,17 @@ int main() {
         }
 
         printf ("SSL connection using %s\n", SSL_get_cipher (ssl));
-        err = SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted)); CHK_SSL(err);
-        err = SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname)); CHK_SSL(err);
-        err = SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted)); CHK_SSL(err);
-        err = SSL_read(ssl, &lenvoterlname, sizeof(lenvoterlname)); CHK_SSL(err);
-        err = SSL_read(ssl, ssnumberencrypted, sizeof(ssnumberencrypted)); CHK_SSL(err);
-        err = SSL_read(ssl, &lenssnumber, sizeof(lenssnumber)); CHK_SSL(err);
-        err = SSL_read(ssl, idnumberencrypted, sizeof(idnumberencrypted)); CHK_SSL(err);
-        err = SSL_read(ssl, &lenidnumber, sizeof(lenidnumber)); CHK_SSL(err);
-        err = SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted)); CHK_SSL(err);
-        err = SSL_read(ssl, &lencanidate, sizeof(lencanidate)); CHK_SSL(err);
-        err = SSL_read(ssl, idnumber2, sizeof(idnumber2)); CHK_SSL(err);
+        err = SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted)); while (err == -1) { err = SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted)); }
+        err = SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname)); while (err == -1) { err = SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname)); }
+        err = SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted));  while (err == -1) { err = SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted));}
+        err = SSL_read(ssl, &lenvoterlname, sizeof(lenvoterlname));  while (err == -1) { err = SSL_read(ssl, &lenvoterlname, sizeof(lenvoterlname)); }
+        err = SSL_read(ssl, ssnumberencrypted, sizeof(ssnumberencrypted));  while (err == -1) { err = SSL_read(ssl, ssnumberencrypted, sizeof(ssnumberencrypted)); }
+        err = SSL_read(ssl, &lenssnumber, sizeof(lenssnumber));  while (err == -1) {err = SSL_read(ssl, &lenssnumber, sizeof(lenssnumber));}
+        err = SSL_read(ssl, idnumberencrypted, sizeof(idnumberencrypted));  while (err == -1) { err = SSL_read(ssl, idnumberencrypted, sizeof(idnumberencrypted)); }
+        err = SSL_read(ssl, &lenidnumber, sizeof(lenidnumber));  while (err == -1) { err = SSL_read(ssl, &lenidnumber, sizeof(lenidnumber)); }
+        err = SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted));  while (err == -1) { err = SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted));}
+        err = SSL_read(ssl, &lencanidate, sizeof(lencanidate));  while (err == -1) { err = SSL_read(ssl, &lencanidate, sizeof(lencanidate));}
+        err = SSL_read(ssl, idnumber2, sizeof(idnumber2));   while (err == -1) { err = SSL_read(ssl, idnumber2, sizeof(idnumber2)); }
         decrypt(lenvoterfname, voterfnameencrypted, idnumber2, voterfname);
         decrypt(lenvoterlname, voterlnameencrypted, idnumber2, voterlname);
         decrypt(lenssnumber, ssnumberencrypted, idnumber2, ssnumber);
