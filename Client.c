@@ -11,7 +11,7 @@
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
-#define resolver_server_address "192.168.1.16"
+#define resolver_server_address "192.168.1.4"
 int padding = RSA_PKCS1_PADDING;
 
 void displayerror(char *error) {
@@ -80,7 +80,6 @@ ssl = SSL_new(ctx);
 const char *ip = resolve(1);
 int network_socket;
 network_socket = socket(AF_INET, SOCK_STREAM, 0);
-char *test = "Hi!";
 struct sockaddr_in ordinary_address;
 ordinary_address.sin_family = AF_INET;
 ordinary_address.sin_port = htons(6969);
