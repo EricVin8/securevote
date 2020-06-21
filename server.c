@@ -100,7 +100,7 @@ int main() {
         int length = sizeof(client);
         int encoded_data_length;
         unsigned char voterfname[4098] = {}, voterlname[4098] = {}, ssnumber[4098] = {}, idnumber[4098] = {}, canidate[4098] = {}, idnumber2[4098] = {};
-        char *voterfnameencrypted, *voterlnameencrypted, *ssnumberencrypted, *idnumberencrypted, *canidateencrypted;
+        char voterfnameencrypted[4098] = {}, *voterlnameencrypted[4098] = {}, ssnumberencrypted[4098] = {}, idnumberencrypted[4098] = {}, canidateencrypted[4098] = {};
         int lenvoterfname, lenvoterlname, lenssnumber, lenidnumber, lencanidate;
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);

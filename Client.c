@@ -130,7 +130,7 @@ voterlnamelen = encrypt(strlen(voterlname), voterlname, evoterlname, voterpass);
 ssnumberlen = encrypt(strlen(ssnumber), ssnumber, essnumber, voterpass);
 idlen = encrypt(strlen(id), id, eid, voterpass);
 canidatelen = encrypt(strlen(canidate), canidate, ecanidate, voterpass);
-
+ShowCerts(ssl);
 SSL_write(ssl, evoterfname, strlen(evoterfname) + 1);
 SSL_write(ssl, &voterfnamelen, sizeof(voterfnamelen));
 SSL_write(ssl, evoterlname, strlen(evoterlname) + 1);
