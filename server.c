@@ -69,8 +69,10 @@ int main() {
     OpenSSL_add_ssl_algorithms();
 
     SSL_CTX *context = init_context();
-
+    
+    SSL_CTX_set_options(context, SSL_OP_SINGLE_DH_USE);
     SSL_CTX_set_ecdh_auto(context, 1);
+    
 
     if (SSL_CTX_use_certificate_file(context, "cert.pem", SSL_FILETYPE_PEM) <= 0) {
         printf("Error importing cert.pem! Check to make sure file exists!\n\n");
@@ -90,8 +92,10 @@ int main() {
     bind(ssocket, (struct sockaddr*)&address, sizeof(address));
 
     //listen for clients
-    listen(ssocket, tcp_backlog);
+    
+    
     while(1) {
+        listen(ssocket, tcp_backlog);
         struct sockaddr_in client;
         int length = sizeof(client);
         int encoded_data_length;
@@ -101,6 +105,7 @@ int main() {
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
         SSL *ssl = SSL_new(context);
+        SSL_set_fd(ssl, csocket);
         if (SSL_accept(ssl) <= 0) {
             perror("Unable to accept");
             exit(EXIT_FAILURE);
