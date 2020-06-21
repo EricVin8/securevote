@@ -12,6 +12,9 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #define resolver_server_address "192.168.1.4"
+#define CHK_NULL(x) if ((x)==NULL) exit (1)
+
+
 int padding = RSA_PKCS1_PADDING;
 
 
@@ -77,6 +80,8 @@ SSL_CTX* InitCTX(void)
 
 
 int main() {
+    X509* server_cert;
+    char *str;
 char ip[4098] = {};
 resolve(1, ip);
 int network_socket;
@@ -89,8 +94,8 @@ ordinary_address.sin_addr.s_addr = inet_addr(ip);
 
 char *voterpass = "voterpass.pem";
 
-char *voterfname = "Tyler", *voterlname = "Chow", *ssnumber = "696969", *id = "42069", *canidate = "shrek", *id2 = "10101010";
-unsigned char evoterfname[4098] = {}, evoterlname[4098] = {}, essnumber[4098] = {}, eid[4098] = {}, ecanidate[4098] = {};
+char *voterfname = "Tyler", *voterlname = "Chow", *ssnumber = "696969", *id = "42069", *canidate = "shrek";
+unsigned char evoterfname[4098] = {}, evoterlname[4098] = {}, essnumber[4098] = {}, eid[4098] = {}, ecanidate[4098] = {}, id2[4098] = "10101010";
 int connection_status = connect(network_socket , (struct sockaddr *) &ordinary_address, sizeof(ordinary_address));
 
 if (connection_status == -1) {
@@ -143,7 +148,7 @@ SSL_write(ssl, &idlen, sizeof(idlen));
 SSL_write(ssl, ecanidate, sizeof(ecanidate));
 SSL_write(ssl, &canidatelen, sizeof(canidatelen));
 printf("%d", canidatelen);
-SSL_write(ssl, id2, sizeof(id2));
+SSL_write(ssl, id2, strlen(id2));
 
 
 
