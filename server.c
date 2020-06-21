@@ -100,7 +100,7 @@ int main() {
         int length = sizeof(client);
         int encoded_data_length;
         unsigned char voterfname[4098] = {}, voterlname[4098] = {}, ssnumber[4098] = {}, idnumber[4098] = {}, canidate[4098] = {}, idnumber2[4098] = {};
-        char voterfnameencrypted[4098] = {}, *voterlnameencrypted[4098] = {}, ssnumberencrypted[4098] = {}, idnumberencrypted[4098] = {}, canidateencrypted[4098] = {};
+        char voterfnameencrypted[4098] = {}, voterlnameencrypted[4098] = {}, ssnumberencrypted[4098] = {}, idnumberencrypted[4098] = {}, canidateencrypted[4098] = {};
         int lenvoterfname, lenvoterlname, lenssnumber, lenidnumber, lencanidate;
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
@@ -122,7 +122,6 @@ int main() {
         SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted));
         SSL_read(ssl, &lencanidate, sizeof(lencanidate));
         SSL_read(ssl, idnumber2, sizeof(idnumber2));
-
         decrypt(lenvoterfname, voterfnameencrypted, idnumber2, voterfname);
         decrypt(lenvoterlname, voterlnameencrypted, idnumber2, voterlname);
         decrypt(lenssnumber, ssnumberencrypted, idnumber2, ssnumber);
