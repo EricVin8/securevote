@@ -104,6 +104,7 @@ int main() {
         int lenvoterfname, lenvoterlname, lenssnumber, lenidnumber, lencanidate;
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
+        close(ssocket);
         SSL *ssl = SSL_new(context);
         SSL_set_fd(ssl, csocket);
         if (SSL_accept(ssl) <= 0) {
@@ -111,6 +112,8 @@ int main() {
             exit(EXIT_FAILURE);
 
         }
+
+        printf ("SSL connection using %s\n", SSL_get_cipher (ssl));
         SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted));
         SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname));
         SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted));

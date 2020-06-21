@@ -73,25 +73,7 @@ SSL_CTX* InitCTX(void)
 }
 
 
-void ShowCerts(SSL* ssl)
-{
-    X509 *cert;
-    char *line;
-    cert = SSL_get_peer_certificate(ssl); /* get the server's certificate */
-    if ( cert != NULL )
-    {
-        printf("Server certificates:\n");
-        line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-        printf("Subject: %s\n", line);
-        free(line);       /* free the malloc'ed string */
-        line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
-        printf("Issuer: %s\n", line);
-        free(line);       /* free the malloc'ed string */
-        X509_free(cert);     /* free the malloc'ed certificate copy */
-    }
-    else
-        printf("Info: No client certificates configured.\n");
-}
+
 
 
 int main() {
@@ -130,19 +112,38 @@ voterlnamelen = encrypt(strlen(voterlname), voterlname, evoterlname, voterpass);
 ssnumberlen = encrypt(strlen(ssnumber), ssnumber, essnumber, voterpass);
 idlen = encrypt(strlen(id), id, eid, voterpass);
 canidatelen = encrypt(strlen(canidate), canidate, ecanidate, voterpass);
-ShowCerts(ssl);
-SSL_write(ssl, evoterfname, strlen(evoterfname) + 1);
+
+
+  printf ("SSL connection using %s\n", SSL_get_cipher (ssl));
+  
+  /* Get server's certificate (note: beware of dynamic allocation) - opt */
+
+  server_cert = SSL_get_peer_certificate (ssl);       CHK_NULL(server_cert);
+  printf ("Server certificate:\n");
+  str = X509_NAME_oneline (X509_get_subject_name (server_cert),0,0);
+  CHK_NULL(str);
+  printf ("\t subject: %s\n", str);
+  OPENSSL_free (str);
+
+  str = X509_NAME_oneline (X509_get_issuer_name  (server_cert),0,0);
+  CHK_NULL(str);
+  printf ("\t issuer: %s\n", str);
+  OPENSSL_free (str);
+
+  X509_free (server_cert);
+
+SSL_write(ssl, evoterfname, sizeof(evoterfname));
 SSL_write(ssl, &voterfnamelen, sizeof(voterfnamelen));
-SSL_write(ssl, evoterlname, strlen(evoterlname) + 1);
+SSL_write(ssl, evoterlname, sizeof(evoterlname));
 SSL_write(ssl, &voterlnamelen, sizeof(voterlname));
-SSL_write(ssl, essnumber, strlen(essnumber) + 1);
+SSL_write(ssl, essnumber, sizeof(essnumber));
 SSL_write(ssl, &ssnumberlen, sizeof(ssnumberlen));
-SSL_write(ssl, eid, strlen(eid) + 1);
+SSL_write(ssl, eid, sizeof(eid));
 SSL_write(ssl, &idlen, sizeof(idlen));
-SSL_write(ssl, ecanidate, strlen(ecanidate) + 1);
+SSL_write(ssl, ecanidate, sizeof(ecanidate));
 SSL_write(ssl, &canidatelen, sizeof(canidatelen));
 printf("%d", canidatelen);
-SSL_write(ssl, id2, strlen(id2) + 1);
+SSL_write(ssl, id2, sizeof(id2));
 
 
 
