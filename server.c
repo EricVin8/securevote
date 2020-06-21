@@ -22,7 +22,7 @@ int padding = RSA_PKCS1_PADDING;
 
 int decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *id2, char *result) {
     
-    FILE * key = fopen(strncat(id2, ".pem", 11),"rb");
+    FILE * key = fopen(id2,"rb");
     if(key == NULL)
     {
         printf("%s cannot be found!\n", id2);

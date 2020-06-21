@@ -90,7 +90,7 @@ fflush(stdout);
 
 char *voterpass = "voterpass.pem";
 
-char *voterfname = "Tyler", *voterlname = "Chow", *ssnumber = "696969", *id = "42069", *canidate = "shrek";
+char *voterfname = "Tyler", *voterlname = "Chow", *ssnumber = "696969", *id = "42069", *canidate = "shrek", *id2 = "10101010";
 unsigned char evoterfname[4098] = {}, evoterlname[4098] = {}, essnumber[4098] = {}, eid[4098] = {}, ecanidate[4098] = {};
 int connection_status = connect(network_socket , (struct sockaddr *) &ordinary_address, sizeof(ordinary_address));
 
@@ -102,12 +102,11 @@ SSL_set_fd(ssl, network_socket);
 SSL_get_cipher(ssl);
 int voterfnamelen, voterlnamelen, ssnumberlen, idlen, canidatelen;
 voterfnamelen = encrypt(strlen(voterfname),voterfname, evoterfname ,voterpass);
-printf(evoterfname);
+
 voterlnamelen = encrypt(strlen(voterlname), voterlname, evoterlname, voterpass);
 ssnumberlen = encrypt(strlen(ssnumber), ssnumber, essnumber, voterpass);
 idlen = encrypt(strlen(id), id, eid, voterpass);
 canidatelen = encrypt(strlen(canidate), canidate, ecanidate, voterpass);
-printf(ecanidate);
 
 SSL_write(ssl, evoterfname, strlen(evoterfname) + 1);
 SSL_write(ssl, &voterfnamelen, sizeof(voterfnamelen));
@@ -119,7 +118,7 @@ SSL_write(ssl, eid, strlen(eid) + 1);
 SSL_write(ssl, &idlen, sizeof(idlen));
 SSL_write(ssl, ecanidate, strlen(ecanidate) + 1);
 SSL_write(ssl, &canidatelen, sizeof(canidatelen));
-
+SSL_write(ssl, id2, strlen(id2) + 1);
 
 
 
