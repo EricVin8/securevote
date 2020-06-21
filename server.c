@@ -95,7 +95,7 @@ int main() {
         struct sockaddr_in client;
         int length = sizeof(client);
         int encoded_data_length;
-        char *voterfname, *voterlname, *ssnumber, *idnumber, *canidate, *idnumber2;
+        unsigned char voterfname[4098] = {}, voterlname[4098] = {}, ssnumber[4098] = {}, idnumber[4098] = {}, canidate[4098] = {}, idnumber2[4098] = {};
         char *voterfnameencrypted, *voterlnameencrypted, *ssnumberencrypted, *idnumberencrypted, *canidateencrypted;
         int lenvoterfname, lenvoterlname, lenssnumber, lenidnumber, lencanidate;
         int value;

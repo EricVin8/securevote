@@ -13,7 +13,6 @@
 #include <openssl/err.h>
 #define resolver_server_address "192.168.1.4"
 int padding = RSA_PKCS1_PADDING;
-char toencrypt[1000];
 
 
 void displayerror(char *error) {
@@ -92,21 +91,24 @@ fflush(stdout);
 char *voterpass = "voterpass.pem";
 
 char *voterfname = "Tyler", *voterlname = "Chow", *ssnumber = "696969", *id = "42069", *canidate = "shrek";
-char *evoterfname, *evoterlname, *essnumber, *eid, *ecanidate;
+unsigned char evoterfname[4098] = {}, evoterlname[4098] = {}, essnumber[4098] = {}, eid[4098] = {}, ecanidate[4098] = {};
 int connection_status = connect(network_socket , (struct sockaddr *) &ordinary_address, sizeof(ordinary_address));
 
 if (connection_status == -1) {
 printf("error connecting to remote socket");
-return -1;
+//27return -1;
  }
 SSL_set_fd(ssl, network_socket); 
 SSL_get_cipher(ssl);
 int voterfnamelen, voterlnamelen, ssnumberlen, idlen, canidatelen;
 voterfnamelen = encrypt(strlen(voterfname),voterfname, evoterfname ,voterpass);
+printf(evoterfname);
 voterlnamelen = encrypt(strlen(voterlname), voterlname, evoterlname, voterpass);
 ssnumberlen = encrypt(strlen(ssnumber), ssnumber, essnumber, voterpass);
 idlen = encrypt(strlen(id), id, eid, voterpass);
 canidatelen = encrypt(strlen(canidate), canidate, ecanidate, voterpass);
+printf(ecanidate);
+
 SSL_write(ssl, evoterfname, strlen(evoterfname) + 1);
 SSL_write(ssl, &voterfnamelen, sizeof(voterfnamelen));
 SSL_write(ssl, evoterlname, strlen(evoterlname) + 1);
@@ -121,10 +123,8 @@ SSL_write(ssl, &canidatelen, sizeof(canidatelen));
 
 
 
-SSL_free(ssl);
 close(network_socket);
 SSL_CTX_free(ctx);
-
 printf("finished");
 
 return 0;
