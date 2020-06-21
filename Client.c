@@ -13,6 +13,8 @@
 #include <openssl/err.h>
 #define resolver_server_address "192.168.1.4"
 int padding = RSA_PKCS1_PADDING;
+char toencrypt[1000];
+
 
 void displayerror(char *error) {
 //todo have gui show error msg
@@ -86,8 +88,11 @@ ordinary_address.sin_port = htons(6969);
 ordinary_address.sin_addr.s_addr = inet_addr(ip);
 printf(ip);
 fflush(stdout);
- 
 
+char *voterpass = "voterpass.pem";
+
+char *voterfname = "Tyler", *voterlname = "Chow", *ssnumber = "696969", *id = "42069", *canidate = "shrek";
+char *evoterfname, *evoterlname, *essnumber, *eid, *ecanidate;
 int connection_status = connect(network_socket , (struct sockaddr *) &ordinary_address, sizeof(ordinary_address));
 
 if (connection_status == -1) {
@@ -96,6 +101,26 @@ return -1;
  }
 SSL_set_fd(ssl, network_socket); 
 SSL_get_cipher(ssl);
+int voterfnamelen, voterlnamelen, ssnumberlen, idlen, canidatelen;
+voterfnamelen = encrypt(strlen(voterfname),voterfname, evoterfname ,voterpass);
+voterlnamelen = encrypt(strlen(voterlname), voterlname, evoterlname, voterpass);
+ssnumberlen = encrypt(strlen(ssnumber), ssnumber, essnumber, voterpass);
+idlen = encrypt(strlen(id), id, eid, voterpass);
+canidatelen = encrypt(strlen(canidate), canidate, ecanidate, voterpass);
+SSL_write(ssl, evoterfname, strlen(evoterfname) + 1);
+SSL_write(ssl, &voterfnamelen, sizeof(voterfnamelen));
+SSL_write(ssl, evoterlname, strlen(evoterlname) + 1);
+SSL_write(ssl, &voterlnamelen, sizeof(voterlname));
+SSL_write(ssl, essnumber, strlen(essnumber) + 1);
+SSL_write(ssl, &ssnumberlen, sizeof(ssnumberlen));
+SSL_write(ssl, eid, strlen(eid) + 1);
+SSL_write(ssl, &idlen, sizeof(idlen));
+SSL_write(ssl, ecanidate, strlen(ecanidate) + 1);
+SSL_write(ssl, &canidatelen, sizeof(canidatelen));
+
+
+
+
 SSL_free(ssl);
 close(network_socket);
 SSL_CTX_free(ctx);

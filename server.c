@@ -20,8 +20,8 @@
 int padding = RSA_PKCS1_PADDING;
 
 
-int decrypt_into_arguments(int encoded_data_length, unsigned char *encoded, unsigned char *filename, char **arguments) {
-    char* result;
+int decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *id2, char* result) {
+    
     FILE * key = fopen(strncat(filename, ".pem", 11),"rb");
     if(key == NULL)
     {
@@ -96,15 +96,28 @@ int main() {
         int length = sizeof(client);
         int encoded_data_length;
         char *voterfname, *voterlname, *ssnumber, *idnumber, *canidate, *idnumber2;
-        char *voterinfoencrypted;
-        char *arguments[] = {voterfname, voterlname, ssnumber, idnumber, canidate};
+        char *voterfnameencrypted, *voterlnameencrypted, *ssnumberencrypted, *idnumberencrypted, *canidateencrypted;
+        int lenvoterfname, lenvoterlname, lenssnumber, lenidnumber, lencanidate;
         int value;
         int csocket = accept(ssocket, (struct sockaddr*)&client, &length);
         SSL *ssl = SSL_new(context);
-        SSL_read(ssl, voterinfoencrypted, sizeof(voterinfoencrypted));
+        SSL_read(ssl, voterfnameencrypted, sizeof(voterfnameencrypted));
+        SSL_read(ssl, &lenvoterfname, sizeof(lenvoterfname));
+        SSL_read(ssl, voterlnameencrypted, sizeof(voterlnameencrypted));
+        SSL_read(ssl, &lenvoterlname, sizeof(lenvoterlname));
+        SSL_read(ssl, ssnumberencrypted, sizeof(ssnumberencrypted));
+        SSL_read(ssl, &lenssnumber, sizeof(lenssnumber));
+        SSL_read(ssl, idnumberencrypted, sizeof(idnumberencrypted));
+        SSL_read(ssl, &lenidnumber, sizeof(lenidnumber));
+        SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted));
+        SSL_read(ssl, &lencanidate, sizeof(lencanidate));
         SSL_read(ssl, idnumber2, sizeof(idnumber2));
         SSL_read(ssl, &encoded_data_length, sizeof(encoded_data_length));
-        decrypt_into_arguments(encoded_data_length, voterinfoencrypted, idnumber2, arguments);
+        decrypt(lenvoterfname, voterfnameencrypted, idnumber2, voterfname);
+        decrypt(lenvoterlname, voterlnameencrypted, idnumber2, voterlname);
+        decrypt(lenssnumber, ssnumberencrypted, idnumber2, ssnumber);
+        decrypt(lenidnumber, idnumberencrypted, idnumber2, idnumber);
+        decrypt(lencanidate, canidateencrypted, idnumber2, canidate);
         int index = sqlite3_bind_parameter_index(result, "@id");
         sqlite3_bind_int(result, index, value);
         if(strncmp(voterfname, sqlite3_column_text(result, 0), strlen(sqlite3_column_text(result, 0))) && strncmp(voterlname, sqlite3_column_text(result, 1), strlen(sqlite3_column_text(result, 1))) && strncmp(ssnumber, sqlite3_column_text(result, 2), strlen(sqlite3_column_text(result, 2))) && strncmp(idnumber, sqlite3_column_text(result, 3), strlen(sqlite3_column_text(result, 3))) && sqlite3_column_text(result, 4) == NULL) {
@@ -113,6 +126,7 @@ int main() {
          sqlite3_free(safecanidate);
         }
         else{
+            printf("voter not found");
             SSL_shutdown(ssl);
             SSL_free(ssl);
             close(csocket);
