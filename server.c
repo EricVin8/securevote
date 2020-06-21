@@ -20,12 +20,12 @@
 int padding = RSA_PKCS1_PADDING;
 
 
-int decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *id2, char* result) {
+int decrypt(int encoded_data_length, unsigned char *encoded, unsigned char *id2, char *result) {
     
-    FILE * key = fopen(strncat(filename, ".pem", 11),"rb");
+    FILE * key = fopen(strncat(id2, ".pem", 11),"rb");
     if(key == NULL)
     {
-        printf("%s cannot be found!\n",filename);
+        printf("%s cannot be found!\n", id2);
         return -1;    
     }
     RSA *rsa= RSA_new();
@@ -112,7 +112,7 @@ int main() {
         SSL_read(ssl, canidateencrypted, sizeof(canidateencrypted));
         SSL_read(ssl, &lencanidate, sizeof(lencanidate));
         SSL_read(ssl, idnumber2, sizeof(idnumber2));
-        SSL_read(ssl, &encoded_data_length, sizeof(encoded_data_length));
+
         decrypt(lenvoterfname, voterfnameencrypted, idnumber2, voterfname);
         decrypt(lenvoterlname, voterlnameencrypted, idnumber2, voterlname);
         decrypt(lenssnumber, ssnumberencrypted, idnumber2, ssnumber);
